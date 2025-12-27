@@ -58,6 +58,19 @@ dependencies {
     implementation(libs.retrofit.moshi)
     implementation(libs.moshi.kotlin)
 
+//    implementation(libs.kotlinStdlib)
+//    implementation(libs.kotlinCoroutinesCore)
+//    implementation(libs.kotlinCoroutinesAndroid)
+
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.moshi)
+
+    implementation(libs.moshi)
+    kapt(libs.moshi.kotlin.codegen)
+
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
+
     // ---- Room Database ----
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
@@ -85,6 +98,7 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.arch.core.testing)
+    testImplementation(libs.mockito.kotlin)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
