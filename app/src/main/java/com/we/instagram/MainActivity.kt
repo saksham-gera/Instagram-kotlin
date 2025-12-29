@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
         navGraph.setStartDestination(
             if (sessionManager.isLoggedIn()) {
-                R.id.feedFragment
+                R.id.homeFragment
             } else {
                 R.id.loginFragment
             }

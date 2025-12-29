@@ -39,8 +39,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                     // optional: show loading
                 }
                 is LoginState.Success -> {
-                    findNavController()
-                        .navigate(R.id.action_login_to_feed)
+                    findNavController().navigate(R.id.action_login_to_home)
                 }
                 is LoginState.Error -> {
                     Toast.makeText(

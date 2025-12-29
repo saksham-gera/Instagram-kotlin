@@ -86,6 +86,7 @@ dependencies {
 
     // ---- RecyclerView ----
     implementation(libs.recyclerview)
+    implementation(libs.androidx.swiperefreshlayout)
 
     // ---- Image Loading ----
     implementation(libs.coil)

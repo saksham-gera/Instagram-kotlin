@@ -18,7 +18,10 @@ class FeedViewModelFactory(
                 postDao = database.postDao(),
                 feedApi = FeedApiProvider.feedApi
             )
-            return FeedViewModel(repository) as T
+            return FeedViewModel(
+                repository = repository,
+                context = context
+            ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

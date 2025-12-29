@@ -14,18 +14,20 @@ class FeedRepository(
     private val postDao: PostDao,
     private val feedApi: FeedApi
 ) {
-    // Return the infinite flow from Room directly
-    fun getPosts(): Flow<List<PostEntity>> = postDao.getAllPosts()
 
-    // Create a separate function for the network work
+    fun getPosts(): Flow<List<PostEntity>> =
+        postDao.getAllPosts()
+
+    suspend fun toggleLike(postId: String) {
+        postDao.toggleLike(postId)
+
+        // Later: sync with server
+    }
+
     suspend fun refreshPosts() {
-        try {
-            val remotePosts = feedApi.getPosts()
-            val entities = remotePosts.map { it.toEntity() }
-            postDao.clearPosts()
-            postDao.insertPosts(entities)
-        } catch (e: Exception) {
-            // Log error
-        }
+        val remotePosts = feedApi.getPosts()
+        val entities = remotePosts.map { it.toEntity() }
+        postDao.clearPosts()
+        postDao.insertPosts(entities)
     }
 }
