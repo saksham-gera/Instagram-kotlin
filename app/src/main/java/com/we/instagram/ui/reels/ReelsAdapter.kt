@@ -16,8 +16,6 @@ class ReelsAdapter(
 ) : RecyclerView.Adapter<ReelsAdapter.ReelViewHolder>() {
 
     private val reels = mutableListOf<ReelEntity>()
-
-    // 🔥 Shared ExoPlayer (BEST PRACTICE)
     private var player: ExoPlayer? = null
 
     fun submitList(list: List<ReelEntity>) {
@@ -37,45 +35,47 @@ class ReelsAdapter(
     }
 
     override fun onBindViewHolder(holder: ReelViewHolder, position: Int) {
-        holder.bind(reels[position], player, onLikeClick)
+        // Only bind non-video UI elements here
+        holder.bindData(reels[position], onLikeClick)
     }
 
     override fun getItemCount(): Int = reels.size
 
-    fun playAt(position: Int) {
-        val reel = reels[position]
-        player?.apply {
-            setMediaItem(MediaItem.fromUri(reel.videoUrl))
-            prepare()
-            playWhenReady = true
-        }
-    }
+    // This handles the transfer of the player to the new view
+    fun onPageSelected(position: Int, recyclerView: RecyclerView) {
+        val holder = recyclerView.findViewHolderForAdapterPosition(position) as? ReelViewHolder
 
-    fun pause() {
-        player?.playWhenReady = false
+        // 1. Reset player state
+        player?.stop()
+        player?.clearMediaItems()
+
+        // 2. Attach the player to the CURRENT ViewHolder's PlayerView
+        holder?.setPlayer(player)
+
+        // 3. Prepare and play the new video
+        if (position < reels.size) {
+            val reel = reels[position]
+            player?.apply {
+                setMediaItem(MediaItem.fromUri(reel.videoUrl))
+                prepare()
+                playWhenReady = true
+            }
+        }
     }
 
     class ReelViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val playerView: PlayerView = view.findViewById(R.id.playerView)
         private val likeBtn: ImageButton = view.findViewById(R.id.btnLike)
 
-        fun bind(
-            reel: ReelEntity,
-            player: ExoPlayer?,
-            onLikeClick: (ReelEntity) -> Unit
-        ) {
-            playerView.player = player
-
+        fun bindData(reel: ReelEntity, onLikeClick: (ReelEntity) -> Unit) {
             likeBtn.setImageResource(
-                if (reel.isLiked)
-                    R.drawable.ic_heart_filled
-                else
-                    R.drawable.ic_heart_outline
+                if (reel.isLiked) R.drawable.ic_heart_filled else R.drawable.ic_heart_outline
             )
+            likeBtn.setOnClickListener { onLikeClick(reel) }
+        }
 
-            likeBtn.setOnClickListener {
-                onLikeClick(reel)
-            }
+        fun setPlayer(player: ExoPlayer?) {
+            playerView.player = player
         }
     }
 }

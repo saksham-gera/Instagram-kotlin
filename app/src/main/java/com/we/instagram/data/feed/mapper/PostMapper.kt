@@ -5,11 +5,11 @@ import com.we.instagram.data.feed.remote.PostDto
 
 fun PostDto.toEntity(): PostEntity {
     return PostEntity(
-        id = id,
-        username = username,
-        imageUrl = imageUrl,
-        caption = caption,
-        likes = likes,
-        isLiked = false
+        postId = postId,
+        userName = userName,
+        userImage = userImage,
+        postImage = postImage,
+        likeCount = likeCount,
+        likedByUser = likedByUser
     )
 }

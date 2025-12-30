@@ -5,10 +5,13 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "posts")
 data class PostEntity(
-    @PrimaryKey val id: String,
-    val username: String,
-    val imageUrl: String,
-    val caption: String,
-    val likes: Int,
-    val isLiked: Boolean
+    @PrimaryKey
+    val postId: String,
+
+    val userName: String,
+    val userImage: String,
+    val postImage: String,
+
+    val likeCount: Int,
+    val likedByUser: Boolean
 )

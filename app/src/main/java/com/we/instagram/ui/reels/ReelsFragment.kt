@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.exoplayer2.ExoPlayer
 import com.we.instagram.R
@@ -37,21 +38,24 @@ class ReelsFragment : Fragment(R.layout.fragment_reels) {
         viewPager.adapter = adapter
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.reels.collectLatest {
-                adapter.submitList(it)
-                if (it.isNotEmpty()) {
-                    adapter.playAt(0)
+            viewModel.reels.collectLatest { list ->
+                adapter.submitList(list)
+                if (list.isNotEmpty()) {
+                    // Wait for the view to layout then trigger the first play
+                    viewPager.post {
+                        val rv = viewPager.getChildAt(0) as RecyclerView
+                        adapter.onPageSelected(0, rv)
+                    }
                 }
             }
         }
 
-        viewPager.registerOnPageChangeCallback(
-            object : ViewPager2.OnPageChangeCallback() {
-                override fun onPageSelected(position: Int) {
-                    adapter.playAt(position)
-                }
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                val recyclerView = viewPager.getChildAt(0) as RecyclerView
+                adapter.onPageSelected(position, recyclerView)
             }
-        )
+        })
     }
 
     override fun onPause() {

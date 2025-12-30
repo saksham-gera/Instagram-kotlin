@@ -30,6 +30,7 @@ class FeedAdapter(
     }
 
     override fun onBindViewHolder(holder: FeedViewHolder, position: Int) {
+        // Corrected: Use FeedViewHolder and post data
         holder.bind(posts[position])
     }
 
@@ -40,27 +41,38 @@ class FeedAdapter(
         private val onLikeClick: (String) -> Unit
     ) : RecyclerView.ViewHolder(view) {
 
+        private val userImage: ImageView = view.findViewById(R.id.ivUserImage)
         private val username: TextView = view.findViewById(R.id.tvUsername)
-        private val caption: TextView = view.findViewById(R.id.tvCaption)
+        private val postImage: ImageView = view.findViewById(R.id.ivPost)
         private val likes: TextView = view.findViewById(R.id.tvLikes)
-        private val image: ImageView = view.findViewById(R.id.ivPost)
         private val btnLike: ImageButton = view.findViewById(R.id.btnLike)
 
         fun bind(post: PostEntity) {
-            username.text = post.username
-            caption.text = post.caption
-            likes.text = "${post.likes} likes"
-            image.load(post.imageUrl)
+            username.text = post.userName
+            likes.text = "${post.likeCount} likes"
 
+            // Load User Avatar
+            userImage.load(post.userImage) {
+                crossfade(true)
+                placeholder(R.drawable.ic_user_placeholder)
+                error(R.drawable.ic_user_placeholder)
+            }
+
+            // Load Main Post Image
+            postImage.load(post.postImage) {
+                crossfade(true)
+            }
+
+            // Update Like UI
             btnLike.setImageResource(
-                if (post.isLiked)
+                if (post.likedByUser)
                     R.drawable.ic_heart_filled
                 else
                     R.drawable.ic_heart_outline
             )
 
             btnLike.setOnClickListener {
-                onLikeClick(post.id)
+                onLikeClick(post.postId)
             }
         }
     }

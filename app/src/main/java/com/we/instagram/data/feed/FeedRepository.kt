@@ -25,9 +25,14 @@ class FeedRepository(
     }
 
     suspend fun refreshPosts() {
-        val remotePosts = feedApi.getPosts()
-        val entities = remotePosts.map { it.toEntity() }
-        postDao.clearPosts()
-        postDao.insertPosts(entities)
+        try {
+            val remotePosts = feedApi.getPosts()
+            val entities = remotePosts.feed.map { it.toEntity() }
+            postDao.clearPosts()
+            postDao.insertPosts(entities)
+            println("Success: Fetched ${entities.size} posts")
+        } catch (e: Exception) {
+            println("Error fetching posts: ${e.message}")
+        }
     }
 }

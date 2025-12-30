@@ -15,12 +15,12 @@ interface PostDao {
     @Query("""
         UPDATE posts
         SET 
-            isLiked = NOT isLiked,
-            likes = CASE
-                WHEN isLiked THEN likes - 1
-                ELSE likes + 1
-            END
-        WHERE id = :postId
+            likeCount = likeCount + CASE 
+                WHEN likedByUser = 0 THEN 1 
+                ELSE -1 
+            END,
+            likedByUser = NOT likedByUser
+        WHERE postId = :postId
     """)
     suspend fun toggleLike(postId: String)
 
