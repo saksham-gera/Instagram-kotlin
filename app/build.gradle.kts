@@ -92,8 +92,10 @@ dependencies {
     implementation(libs.coil)
 
     // ---- ExoPlayer (Bonus / Reels) ----
-    implementation(libs.exoplayer.core)
-    implementation(libs.exoplayer.ui)
+//    implementation(libs.exoplayer.core)
+//    implementation(libs.exoplayer.ui)
+    implementation(libs.androidx.media.exoplayer)
+    implementation(libs.androidx.media.ui)
 
     // ---- Testing ----
     testImplementation(libs.junit)

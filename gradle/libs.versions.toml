@@ -17,7 +17,7 @@ moshi = "1.15.0"
 room = "2.6.1"
 coroutines = "1.7.3"
 lifecycle = "2.8.4"
-exoplayer = "1.2.1"
+exoplayer = "2.19.1"
 coil = "2.5.0"
 recyclerview = "1.3.2"
 okhttp = "4.11.0"
@@ -59,8 +59,10 @@ lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmode
 lifecycle-livedata = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycle" }
 
 # ---------------- ExoPlayer ----------------
-exoplayer-core = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "exoplayer" }
-exoplayer-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "exoplayer" }
+#exoplayer-core = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "exoplayer" }
+#exoplayer-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "exoplayer" }
+androidx-media-exoplayer = { module = "com.google.android.exoplayer:exoplayer", version.ref = "exoplayer" }
+androidx-media-ui = { module = "com.google.android.exoplayer:exoplayer-ui", version.ref = "exoplayer" }
 
 # ---------------- Image Loading ----------------
 coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
