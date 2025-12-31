@@ -11,5 +11,5 @@ data class ReelEntity(
     val videoUrl: String,
     val likeCount: Int,
     val isLiked: Boolean,
-    val pendingSync: Boolean = false // 🔥 for offline like/unlike
+    val pendingSync: Boolean = false
 )

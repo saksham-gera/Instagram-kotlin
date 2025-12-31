@@ -13,17 +13,22 @@ class ReelsViewModel(
 
     val reels: StateFlow<List<ReelEntity>> =
         repository.getReels()
-            .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5_000),
+                emptyList()
+            )
 
-    init {
-        viewModelScope.launch {
-            repository.refresh()
-        }
-    }
+    private val _error = MutableSharedFlow<String>()
+    val error: SharedFlow<String> = _error.asSharedFlow()
 
     fun onLikeClicked(reel: ReelEntity) {
         viewModelScope.launch {
-            repository.toggleLike(reel.id, !reel.isLiked)
+            try {
+                repository.toggleLike(reel.id)
+            } catch (e: Exception) {
+                _error.emit("Failed to update reel like")
+            }
         }
     }
 }

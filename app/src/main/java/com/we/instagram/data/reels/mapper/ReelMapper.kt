@@ -7,7 +7,7 @@ fun ReelDto.toEntity() = ReelEntity(
     id = id,
     userName = userName,
     userImage = userImage,
-    videoUrl = videoUrl,
+    videoUrl = reelVideo,
     likeCount = likeCount,
     isLiked = likedByUser
 )

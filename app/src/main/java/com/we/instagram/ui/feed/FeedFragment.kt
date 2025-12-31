@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.snackbar.Snackbar
 import com.we.instagram.R
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -53,6 +54,17 @@ class FeedFragment : Fragment(R.layout.fragment_feed) {
             viewModel.isOffline.collectLatest { offline ->
                 offlineText.visibility =
                     if (offline) View.VISIBLE else View.GONE
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.error.collectLatest { message ->
+                Snackbar.make(
+                    requireView(),
+                    message,
+                    Snackbar.LENGTH_SHORT
+                ).show()
+                println(message)
             }
         }
     }

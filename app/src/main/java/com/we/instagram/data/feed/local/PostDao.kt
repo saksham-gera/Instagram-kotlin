@@ -24,6 +24,9 @@ interface PostDao {
     """)
     suspend fun toggleLike(postId: String)
 
+    @Query("SELECT * FROM posts WHERE postId = :postId LIMIT 1")
+    suspend fun getPostById(postId: String): PostEntity
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPosts(posts: List<PostEntity>)
 

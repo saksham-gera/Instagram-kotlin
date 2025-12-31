@@ -1,33 +1,51 @@
 package com.we.instagram.data.reels
 
 import com.we.instagram.data.reels.local.ReelDao
-import com.we.instagram.data.reels.local.ReelEntity
-import com.we.instagram.data.reels.mapper.toEntity
+import com.we.instagram.data.reels.remote.ReelLikeRequest
 import com.we.instagram.data.reels.remote.ReelsApi
-import kotlinx.coroutines.flow.Flow
+import com.we.instagram.util.NetworkUtils
 
 class ReelsRepository(
     private val dao: ReelDao,
-    private val api: ReelsApi
+    private val api: ReelsApi,
+    private val networkUtils: NetworkUtils
 ) {
 
-    fun getReels(): Flow<List<ReelEntity>> = dao.getReels()
+    fun getReels() = dao.getReels()
 
-    suspend fun refresh() {
-        val remote = api.getReels()
-        dao.insertAll(remote.reels.map { it.toEntity() })
-    }
+    suspend fun toggleLike(reelId: String) {
 
-    suspend fun toggleLike(reelId: String, liked: Boolean) {
-        val delta = if (liked) 1 else -1
-        dao.updateLike(reelId, liked, delta)
+        // 1️⃣ Get current reel
+        val reel = dao.getReelById(reelId)
 
+        val newLikedState = !reel.isLiked
+        val delta = if (newLikedState) 1 else -1
+
+        // 2️⃣ Optimistic DB update
+        dao.updateLike(
+            reelId = reelId,
+            liked = newLikedState,
+            delta = delta
+        )
+
+        // 3️⃣ Offline → stop here (pendingSync already marked)
+        if (!networkUtils.isNetworkAvailable()) return
+
+        // 4️⃣ API call
         try {
-            val body = mapOf("reels_id" to reelId)
-            if (liked) api.likeReel(body) else api.dislikeReel(body)
+            if (newLikedState) {
+                api.likeReel(ReelLikeRequest(true, reelId))
+            } else {
+                api.dislikeReel(reelId)
+            }
+
         } catch (e: Exception) {
-            // rollback on failure
-            dao.updateLike(reelId, !liked, -delta)
+            // 5️⃣ Revert on failure
+            dao.updateLike(
+                reelId = reelId,
+                liked = reel.isLiked,
+                delta = -delta
+            )
             throw e
         }
     }

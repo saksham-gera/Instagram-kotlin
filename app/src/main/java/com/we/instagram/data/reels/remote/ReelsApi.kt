@@ -4,12 +4,16 @@ import retrofit2.http.*
 
 interface ReelsApi {
 
-    @GET("user/reels")
+    @GET("reels")
     suspend fun getReels(): ReelsResponse
 
-    @POST("user/like")
-    suspend fun likeReel(@Body body: Map<String, String>)
+    @POST("like")
+    suspend fun likeReel(
+        @Body body: ReelLikeRequest
+    )
 
-    @DELETE("user/dislike")
-    suspend fun dislikeReel(@Body body: Map<String, String>)
+    @DELETE("dislike")
+    suspend fun dislikeReel(
+        @Query("reels_id") reelId: String
+    )
 }

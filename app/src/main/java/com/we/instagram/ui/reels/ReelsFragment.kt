@@ -4,12 +4,15 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.material.snackbar.Snackbar
 import com.we.instagram.R
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class ReelsFragment : Fragment(R.layout.fragment_reels) {
 
@@ -34,18 +37,29 @@ class ReelsFragment : Fragment(R.layout.fragment_reels) {
         }
 
         adapter.attachPlayer(player)
-
         viewPager.adapter = adapter
 
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.reels.collectLatest { list ->
-                adapter.submitList(list)
-                if (list.isNotEmpty()) {
-                    // Wait for the view to layout then trigger the first play
-                    viewPager.post {
-                        val rv = viewPager.getChildAt(0) as RecyclerView
-                        adapter.onPageSelected(0, rv)
+        // 🔥 Collect reels
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.reels.collect { list ->
+                    adapter.submitList(list)
+
+                    if (list.isNotEmpty()) {
+                        viewPager.post {
+                            val rv = viewPager.getChildAt(0) as RecyclerView
+                            adapter.onPageSelected(0, rv)
+                        }
                     }
+                }
+            }
+        }
+
+        // ❌ Error snackbar
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.error.collect { message ->
+                    Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
                 }
             }
         }
@@ -58,8 +72,8 @@ class ReelsFragment : Fragment(R.layout.fragment_reels) {
         })
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onStop() {
+        super.onStop()
         player.pause()
     }
 

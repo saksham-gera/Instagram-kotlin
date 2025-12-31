@@ -12,11 +12,19 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 class FeedViewModel(
     private val repository: FeedRepository,
     private val context: Context
 ) : ViewModel() {
+
+    private val _error = MutableSharedFlow<String>(
+        replay = 0,
+        extraBufferCapacity = 1
+    )
+    val error: SharedFlow<String> = _error
 
     val feed: StateFlow<List<PostEntity>> =
         repository.getPosts()
@@ -25,9 +33,9 @@ class FeedViewModel(
                 SharingStarted.WhileSubscribed(5_000),
                 emptyList()
             )
-
+    val networkUtils = NetworkUtils(context.applicationContext)
     private val _isOffline = MutableStateFlow(
-        !NetworkUtils.isNetworkAvailable(context)
+        !networkUtils.isNetworkAvailable()
     )
     val isOffline: StateFlow<Boolean> = _isOffline
 
@@ -38,7 +46,12 @@ class FeedViewModel(
 
     fun onLikeClicked(postId: String) {
         viewModelScope.launch {
-            repository.toggleLike(postId)
+            try {
+                repository.toggleLike(postId)
+            } catch (e: Exception) {
+                println(e)
+                _error.emit("Failed to update like")
+            }
         }
     }
 
@@ -58,7 +71,8 @@ class FeedViewModel(
     private fun observeNetwork() {
         viewModelScope.launch {
             while (true) {
-                val offlineNow = !NetworkUtils.isNetworkAvailable(context)
+                val networkUtils = NetworkUtils(context.applicationContext)
+                val offlineNow = !networkUtils.isNetworkAvailable()
                 if (_isOffline.value != offlineNow) {
                     _isOffline.value = offlineNow
 
