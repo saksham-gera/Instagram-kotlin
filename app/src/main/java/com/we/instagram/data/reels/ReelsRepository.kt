@@ -1,6 +1,7 @@
 package com.we.instagram.data.reels
 
 import com.we.instagram.data.reels.local.ReelDao
+import com.we.instagram.data.reels.mapper.toEntity
 import com.we.instagram.data.reels.remote.ReelLikeRequest
 import com.we.instagram.data.reels.remote.ReelsApi
 import com.we.instagram.util.NetworkUtils
@@ -46,6 +47,23 @@ class ReelsRepository(
                 liked = reel.isLiked,
                 delta = -delta
             )
+            throw e
+        }
+
+    }
+
+    // In ReelsRepository.kt
+    suspend fun refreshReels() {
+        try {
+            // 1. Fetch from API
+            val response = api.getReels() //
+
+            // 2. Map DTOs to Entities
+            val entities = response.reels.map { it.toEntity() } //
+
+            // 3. Save to Local DB
+            dao.insertAll(entities) //
+        } catch (e: Exception) {
             throw e
         }
     }

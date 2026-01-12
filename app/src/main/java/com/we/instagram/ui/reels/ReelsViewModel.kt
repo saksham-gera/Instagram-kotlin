@@ -11,6 +11,21 @@ class ReelsViewModel(
     private val repository: ReelsRepository
 ) : ViewModel() {
 
+    // In ReelsViewModel.kt
+    init {
+        fetchReels()
+    }
+
+    fun fetchReels() {
+        viewModelScope.launch {
+            try {
+                repository.refreshReels()
+            } catch (e: Exception) {
+                _error.emit("Check your internet connection") //
+            }
+        }
+    }
+
     val reels: StateFlow<List<ReelEntity>> =
         repository.getReels()
             .stateIn(

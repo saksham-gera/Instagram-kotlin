@@ -43,9 +43,11 @@ class ReelsFragment : Fragment(R.layout.fragment_reels) {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.reels.collect { list ->
+                    android.util.Log.d("ReelsFragment", "Received ${list.size} reels")
                     adapter.submitList(list)
 
                     if (list.isNotEmpty()) {
+                        android.util.Log.d("ReelsFragment", "Received ${list.size} reels")
                         viewPager.post {
                             val rv = viewPager.getChildAt(0) as RecyclerView
                             adapter.onPageSelected(0, rv)
